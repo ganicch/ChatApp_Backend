@@ -21,6 +21,8 @@ var io = new socketIo.Server(server, {
 });
 
 let messages = [];
+let users = [];
+
 io.on('connection', (socket) => {
   console.log('New client connected');
   socket.emit('allMessages', messages);
@@ -29,6 +31,13 @@ io.on('connection', (socket) => {
     console.log('Received message:', message);
     messages.push(message); 
     io.emit('message', message);
+  });
+
+  socket.on('user', (user) => {
+    console.log('User joined', user);
+    users.push(user); 
+    socket.emit('users', users);
+
   });
 
   socket.on('disconnect', () => {
