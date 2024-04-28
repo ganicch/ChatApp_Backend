@@ -13,37 +13,47 @@ app.use(cookieParser());
 app.use(cors());
 
 const server = http.createServer(app);
+if(!io){
 var io = new socketIo.Server(server, {
   cors: {
     origin: "http://localhost:3000",
     methods: ["GET", "POST"]
   }
-});
+});}
 
 let messages = [];
 let users = [];
 
-io.on('connection', (socket) => {
-  console.log('New client connected');
-  socket.emit('allMessages', messages);
+  io.on('connection', (socket) => {
+    console.log('New client connected');
+    socket.emit('allMessages', messages);
+  
+    socket.on('message', (message,username) => {
+      console.log('Received message:', message, username);
+      messages.push({username:username, message:message}); 
+      io.emit('message', {username:username, message:message});
+    });
+  
+    socket.on('user', (user) => {
+      console.log('User joined', user);
+      socket.username = user;
+      users.push(user); 
+      io.emit('users', users);
+  
+    });
+    /*socket.on('notification', (user) => {
+      socket.emit('notify', socket.username);
+    });*/
 
-  socket.on('message', (message) => {
-    console.log('Received message:', message);
-    messages.push(message); 
-    io.emit('message', message);
+  
+    socket.on('disconnect', () => {
+      users = users.filter(user => user !== socket.username);
+      console.log('Client disconnected');
+      io.emit('users', users);
+    });
   });
 
-  socket.on('user', (user) => {
-    console.log('User joined', user);
-    users.push(user); 
-    socket.emit('users', users);
 
-  });
-
-  socket.on('disconnect', () => {
-    console.log('Client disconnected');
-  });
-});
 
 
 app.get("/", (req, res) => {
