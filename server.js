@@ -29,25 +29,29 @@ let users = [];
     socket.emit('allMessages', messages);
   
     socket.on('message', (message,username) => {
-      console.log('Received message:', message, username);
       messages.push({username:username, message:message}); 
       io.emit('message', {username:username, message:message});
     });
+    socket.on('join', (user) => {
+      messages.push({username:user, message: user  + " joined the chat",status: "joined"}); 
+      io.emit('message', {username:user, message: user  + " joined the chat", status: "joined"});
+    })
   
     socket.on('user', (user) => {
-      console.log('User joined', user);
+      socket.username = user;
       socket.username = user;
       users.push(user); 
       io.emit('users', users);
   
     });
-    /*socket.on('notification', (user) => {
-      socket.emit('notify', socket.username);
-    });*/
-
   
     socket.on('disconnect', () => {
       users = users.filter(user => user !== socket.username);
+      users.map(user => socket.username == user ?
+        messages = messages.filter(mess => !(mess.status === "joined" && mess.username === socket.username))
+        :
+        null
+      )
       console.log('Client disconnected');
       io.emit('users', users);
     });
