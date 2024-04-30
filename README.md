@@ -18,14 +18,6 @@ npm install
 ```npm
 npm start
 ```
-
-## Possible problems
-If you're having issues with react-script, run the following command in your terminal within the project:
-```npm
-npm install react-scripts --save
-```
-
-
 # Contact
 > Edin Ganić - edinganic99@gmail.com
 
