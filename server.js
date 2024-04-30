@@ -3,7 +3,7 @@ const app = express();
 const PORT = 3001;
 const http = require('http');
 const socketIo = require('socket.io');
-
+const pool = require('./config/database_config')
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 
@@ -28,11 +28,15 @@ let users = [];
     socket.emit('allMessages', messages);
   
     socket.on('message', (message,username) => {
-      messages.push({username:username, message:message}); 
+      messages.push({username:username, message:message});
+      pool.query('insert into messages (message,username) values($1,$2)',
+      [message,username]) 
       io.emit('message', {username:username, message:message});
     });
     socket.on('join', (user) => {
-      messages.push({username:user, message: user  + " joined the chat",status: "joined"}); 
+      messages.push({username:user, message: user  + " joined the chat",status: "joined"});
+      pool.query('insert into messages (message,status,username) values($1,$2,$3)',
+      [user  + " joined the chat","joined",user]) 
       io.emit('message', {username:user, message: user  + " joined the chat", status: "joined"});
     })
   
@@ -58,8 +62,9 @@ let users = [];
 const userRouter = require("./routes/user")
 app.use("/user",userRouter);
 
-app.get("/", (req, res) => {
-    
+app.get("/", async (req, res) => {
+   const mess = await pool.query('select * from messages');
+   messages = mess.rows;
 });
 
 server.listen(PORT, () => {
