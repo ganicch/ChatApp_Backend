@@ -25,7 +25,6 @@ let messages = [];
 let users = [];
 
   io.on('connection', (socket) => {
-    console.log('New client connected');
     socket.emit('allMessages', messages);
   
     socket.on('message', (message,username) => {
@@ -52,16 +51,15 @@ let users = [];
         :
         null
       )
-      console.log('Client disconnected');
       io.emit('users', users);
     });
   });
 
-
-
+const userRouter = require("./routes/user")
+app.use("/user",userRouter);
 
 app.get("/", (req, res) => {
- res.send("hello")
+    
 });
 
 server.listen(PORT, () => {
