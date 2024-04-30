@@ -14,6 +14,8 @@ git clone https://github.com/ganicch/ChatApp_Backend.git
 ```node
 npm install
 ```
+3. Make .env fajl with code line "DATABASE_PASSWORD = eVGdzp8orskXyrjsscf6Vod3J3s30LQ6"
+
 ## Start
 ```npm
 npm start
